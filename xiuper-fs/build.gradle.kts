@@ -1,7 +1,9 @@
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
-    id("com.android.library")
+    // Android library plugin commented out due to Google Maven repository access restrictions
+    // Uncomment when building with Android support
+    // id("com.android.library")
     alias(libs.plugins.sqldelight)
 }
 
@@ -31,26 +33,30 @@ sqldelight {
     }
 }
 
-android {
-    namespace = "cc.unitmesh.xiuper.fs"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
+// Android configuration commented out due to Google Maven repository access restrictions
+// Uncomment when building with Android support
+// android {
+//     namespace = "cc.unitmesh.xiuper.fs"
+//     compileSdk = 34
+//     defaultConfig {
+//         minSdk = 24
+//     }
+//     compileOptions {
+//         sourceCompatibility = JavaVersion.VERSION_17
+//         targetCompatibility = JavaVersion.VERSION_17
+//     }
+// }
 
 kotlin {
     jvmToolchain(17)
 
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
-    }
+    // Android target commented out due to Google Maven repository access restrictions
+    // Uncomment when building with Android support
+    // androidTarget {
+    //     compilerOptions {
+    //         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    //     }
+    // }
 
     jvm()
 
@@ -105,14 +111,16 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
-            dependencies {
-                implementation(libs.ktor.client.cio)
-                implementation(libs.sqldelight.android)
-                // MCP SDK for Android
-                implementation(libs.mcp.kotlin.sdk)
-            }
-        }
+        // Android source set commented out due to Google Maven repository access restrictions
+        // Uncomment when building with Android support
+        // val androidMain by getting {
+        //     dependencies {
+        //         implementation(libs.ktor.client.cio)
+        //         implementation(libs.sqldelight.android)
+        //         // MCP SDK for Android
+        //         implementation(libs.mcp.kotlin.sdk)
+        //     }
+        // }
 
         val jsMain by getting {
             dependencies {

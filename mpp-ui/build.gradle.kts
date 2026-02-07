@@ -15,7 +15,9 @@ plugins {
     id("org.jetbrains.compose")
     kotlin("plugin.serialization")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("com.android.application")
+    // Android application plugin commented out due to Google Maven repository access restrictions
+    // Uncomment when building with Android support
+    // id("com.android.application")
     id("app.cash.sqldelight") version "2.1.0"
     id("de.comahe.i18n4k") version "0.11.1"
     alias(libs.plugins.ktlint)
@@ -71,13 +73,15 @@ kotlin {
         }
     }
 
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-            freeCompilerArgs.add("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api")
-            freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
-        }
-    }
+    // Android target commented out due to Google Maven repository access restrictions
+    // Uncomment when building with Android support
+    // androidTarget {
+    //     compilerOptions {
+    //         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    //         freeCompilerArgs.add("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api")
+    //         freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
+    //     }
+    // }
 
     // iOS targets
     listOf(
@@ -268,58 +272,60 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
-            dependencies {
-                implementation(project(":mpp-viewer-web"))
-                implementation(project(":xiuper-ui")) {
-                    exclude(group = "io.github.oshai", module = "kotlin-logging-jvm")
-                    exclude(group = "io.github.oshai", module = "kotlin-logging-android-debug")
-                }
-
-                // Kotlin Logging for Android (use Android version instead of JVM version)
-                implementation("io.github.oshai:kotlin-logging-android:${libs.versions.kotlinLogging.get()}") {
-                    exclude(group = "io.github.oshai", module = "kotlin-logging-android-debug")
-                }
-
-                implementation(libs.androidx.activity)
-                implementation(libs.androidx.appcompat)
-                implementation(libs.androidx.core)
-
-                // SLF4J Android backend (compatible with Android, replaces logback)
-                implementation("com.github.tony19:logback-android:3.0.0")
-
-                // ComposeCharts - Cross-platform chart library (Android)
-                implementation(libs.compose.charts)
-
-                // Lets-Plot Compose (Android)
-                // https://github.com/JetBrains/lets-plot-compose
-                implementation(libs.letsplot.kotlin)
-                implementation(libs.letsplot.common)
-                implementation(libs.letsplot.canvas)
-                implementation(libs.letsplot.raster)
-                implementation(libs.letsplot.compose)
-
-                // Bonsai Tree View (Android)
-                implementation(libs.bonsai.core)
-                implementation(libs.bonsai.fileSystem)
-
-                // SQLDelight - Android SQLite driver
-                implementation(libs.sqldelight.android)
-
-                // Multiplatform Markdown Renderer for Android
-                implementation(libs.markdown.renderer)
-                implementation(libs.markdown.renderer.m3)
-
-                // Coroutines Android for Dispatchers.Main on Android
-                implementation(libs.kotlinx.coroutines.android)
-
-                // Ktor HTTP Client CIO engine for Android
-                implementation(libs.ktor.client.cio)
-
-                // i18n4k - Android
-                implementation(libs.i18n4k.core.android)
-            }
-        }
+        // Android source set commented out due to Google Maven repository access restrictions
+        // Uncomment when building with Android support
+        // val androidMain by getting {
+        //     dependencies {
+        //         implementation(project(":mpp-viewer-web"))
+        //         implementation(project(":xiuper-ui")) {
+        //             exclude(group = "io.github.oshai", module = "kotlin-logging-jvm")
+        //             exclude(group = "io.github.oshai", module = "kotlin-logging-android-debug")
+        //         }
+        // 
+        //         // Kotlin Logging for Android (use Android version instead of JVM version)
+        //         implementation("io.github.oshai:kotlin-logging-android:${libs.versions.kotlinLogging.get()}") {
+        //             exclude(group = "io.github.oshai", module = "kotlin-logging-android-debug")
+        //         }
+        // 
+        //         implementation(libs.androidx.activity)
+        //         implementation(libs.androidx.appcompat)
+        //         implementation(libs.androidx.core)
+        // 
+        //         // SLF4J Android backend (compatible with Android, replaces logback)
+        //         implementation("com.github.tony19:logback-android:3.0.0")
+        // 
+        //         // ComposeCharts - Cross-platform chart library (Android)
+        //         implementation(libs.compose.charts)
+        // 
+        //         // Lets-Plot Compose (Android)
+        //         // https://github.com/JetBrains/lets-plot-compose
+        //         implementation(libs.letsplot.kotlin)
+        //         implementation(libs.letsplot.common)
+        //         implementation(libs.letsplot.canvas)
+        //         implementation(libs.letsplot.raster)
+        //         implementation(libs.letsplot.compose)
+        // 
+        //         // Bonsai Tree View (Android)
+        //         implementation(libs.bonsai.core)
+        //         implementation(libs.bonsai.fileSystem)
+        // 
+        //         // SQLDelight - Android SQLite driver
+        //         implementation(libs.sqldelight.android)
+        // 
+        //         // Multiplatform Markdown Renderer for Android
+        //         implementation(libs.markdown.renderer)
+        //         implementation(libs.markdown.renderer.m3)
+        // 
+        //         // Coroutines Android for Dispatchers.Main on Android
+        //         implementation(libs.kotlinx.coroutines.android)
+        // 
+        //         // Ktor HTTP Client CIO engine for Android
+        //         implementation(libs.ktor.client.cio)
+        // 
+        //         // i18n4k - Android
+        //         implementation(libs.i18n4k.core.android)
+        //     }
+        // }
 
         val iosX64Main by getting
         val iosArm64Main by getting
@@ -424,45 +430,47 @@ kotlin {
     }
 }
 
-android {
-    namespace = "cc.unitmesh.devins.ui"
-    compileSdk = 36
-
-    defaultConfig {
-        applicationId = "cc.unitmesh.devins.ui"
-        minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = version.toString()
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
-    }
-
-    packaging {
-        resources {
-            excludes +=
-                setOf(
-                    "META-INF/INDEX.LIST",
-                    "META-INF/DEPENDENCIES",
-                    "META-INF/LICENSE",
-                    "META-INF/LICENSE.txt",
-                    "META-INF/license.txt",
-                    "META-INF/NOTICE",
-                    "META-INF/NOTICE.txt",
-                    "META-INF/notice.txt",
-                    "META-INF/*.kotlin_module",
-                    "META-INF/io.netty.versions.properties"
-                )
-        }
-    }
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-}
+// Android configuration commented out due to Google Maven repository access restrictions
+// Uncomment when building with Android support
+// android {
+//     namespace = "cc.unitmesh.devins.ui"
+//     compileSdk = 36
+// 
+//     defaultConfig {
+//         applicationId = "cc.unitmesh.devins.ui"
+//         minSdk = 24
+//         targetSdk = 36
+//         versionCode = 1
+//         versionName = version.toString()
+//     }
+// 
+//     compileOptions {
+//         sourceCompatibility = JavaVersion.VERSION_17
+//         targetCompatibility = JavaVersion.VERSION_17
+//         isCoreLibraryDesugaringEnabled = true
+//     }
+// 
+//     packaging {
+//         resources {
+//             excludes +=
+//                 setOf(
+//                     "META-INF/INDEX.LIST",
+//                     "META-INF/DEPENDENCIES",
+//                     "META-INF/LICENSE",
+//                     "META-INF/LICENSE.txt",
+//                     "META-INF/license.txt",
+//                     "META-INF/NOTICE",
+//                     "META-INF/NOTICE.txt",
+//                     "META-INF/notice.txt",
+//                     "META-INF/*.kotlin_module",
+//                     "META-INF/io.netty.versions.properties"
+//                 )
+//         }
+//     }
+// 
+//     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+//     sourceSets["main"].res.srcDirs("src/androidMain/res")
+// }
 
 // Exclude logback from Android - it uses Java 9 module APIs not available on Android
 configurations.all {
@@ -473,7 +481,8 @@ configurations.all {
 }
 
 dependencies {
-    coreLibraryDesugaring(libs.desugar)
+    // Android dependency commented out due to Google Maven repository access restrictions
+    // coreLibraryDesugaring(libs.desugar)
 }
 
 compose.desktop {

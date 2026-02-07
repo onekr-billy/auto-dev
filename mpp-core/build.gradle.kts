@@ -1,9 +1,9 @@
-import org.gradle.kotlin.dsl.implementation
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
-    id("com.android.library")
+    // Android library plugin commented out due to Google Maven repository access restrictions
+    // Uncomment when building with Android support
+    // id("com.android.library")
     `maven-publish`
 
     // Temporarily disabled: npm publish plugin doesn't support wasmJs targets
@@ -19,36 +19,40 @@ repositories {
 group = "cc.unitmesh"
 version = project.findProperty("mppVersion") as String? ?: "0.1.5"
 
-android {
-    namespace = "cc.unitmesh.devins.core"
-    compileSdk = 34
-
-    defaultConfig {
-        minSdk = 24
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
-    }
-
-    lint {
-        abortOnError = false
-        warningsAsErrors = false
-    }
-}
-
-dependencies {
-    coreLibraryDesugaring(libs.desugar)
-}
+// Android configuration commented out due to Google Maven repository access restrictions
+// Uncomment when building with Android support
+// android {
+//     namespace = "cc.unitmesh.devins.core"
+//     compileSdk = 34
+// 
+//     defaultConfig {
+//         minSdk = 24
+//     }
+// 
+//     compileOptions {
+//         sourceCompatibility = JavaVersion.VERSION_17
+//         targetCompatibility = JavaVersion.VERSION_17
+//         isCoreLibraryDesugaringEnabled = true
+//     }
+// 
+//     lint {
+//         abortOnError = false
+//         warningsAsErrors = false
+//     }
+// }
+// 
+// dependencies {
+//     coreLibraryDesugaring(libs.desugar)
+// }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
-    }
+    // Android target commented out due to Google Maven repository access restrictions
+    // Uncomment when building with Android support
+    // androidTarget {
+    //     compilerOptions {
+    //         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    //     }
+    // }
 
     jvm {
         compilerOptions {
@@ -155,15 +159,17 @@ kotlin {
             }
         }
 
-        androidMain {
-            dependencies {
-                // AndroidX DocumentFile for SAF support
-                implementation(libs.androidx.documentfile)
-
-                // Ktor CIO engine for Android
-                implementation(libs.ktor.client.cio)
-            }
-        }
+        // Android source set commented out due to Google Maven repository access restrictions
+        // Uncomment when building with Android support
+        // androidMain {
+        //     dependencies {
+        //         // AndroidX DocumentFile for SAF support
+        //         implementation(libs.androidx.documentfile)
+        // 
+        //         // Ktor CIO engine for Android
+        //         implementation(libs.ktor.client.cio)
+        //     }
+        // }
 
         jvmMain {
             repositories {

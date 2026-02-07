@@ -10,7 +10,9 @@ plugins {
     id("org.jetbrains.compose")
     kotlin("plugin.serialization")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("com.android.library")
+    // Android library plugin commented out due to Google Maven repository access restrictions
+    // Uncomment when building with Android support
+    // id("com.android.library")
 }
 
 repositories {
@@ -43,11 +45,13 @@ kotlin {
         }
     }
 
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
-    }
+    // Android target commented out due to Google Maven repository access restrictions
+    // Uncomment when building with Android support
+    // androidTarget {
+    //     compilerOptions {
+    //         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    //     }
+    // }
 
     listOf(
         iosX64(),
@@ -113,12 +117,14 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
-            dependencies {
-                // compose-webview-multiplatform - Android support
-                implementation(libs.compose.webview)
-            }
-        }
+        // Android source set commented out due to Google Maven repository access restrictions
+        // Uncomment when building with Android support
+        // val androidMain by getting {
+        //     dependencies {
+        //         // compose-webview-multiplatform - Android support
+        //         implementation(libs.compose.webview)
+        //     }
+        // }
 
         val iosMain by creating {
             dependencies {
@@ -235,16 +241,18 @@ tasks.matching {
     dependsOn(downloadMermaid)
 }
 
-android {
-    namespace = "cc.unitmesh.viewer.web"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 24
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
+// Android configuration commented out due to Google Maven repository access restrictions
+// Uncomment when building with Android support
+// android {
+//     namespace = "cc.unitmesh.viewer.web"
+//     compileSdk = 36
+// 
+//     defaultConfig {
+//         minSdk = 24
+//     }
+// 
+//     compileOptions {
+//         sourceCompatibility = JavaVersion.VERSION_17
+//         targetCompatibility = JavaVersion.VERSION_17
+//     }
+// }
