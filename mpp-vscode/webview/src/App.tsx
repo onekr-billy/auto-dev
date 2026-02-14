@@ -10,6 +10,7 @@ import { Timeline } from './components/Timeline';
 import { ChatInput } from './components/ChatInput';
 import { ModelConfig } from './components/ModelSelector';
 import { ModelConfigDialog } from './components/ModelConfigDialog';
+import { McpConfigPanel } from './components/McpConfigPanel';
 import { SelectedFile } from './components/FileChip';
 import { CompletionItem } from './components/CompletionPopup';
 import { PlanData } from './components/plan';
@@ -79,6 +80,7 @@ const App: React.FC = () => {
   const [showModelConfigDialog, setShowModelConfigDialog] = useState(false);
   const [modelConfigDialogConfig, setModelConfigDialogConfig] = useState<ModelConfig | null>(null);
   const [isNewConfig, setIsNewConfig] = useState(false);
+  const [showMcpConfigPanel, setShowMcpConfigPanel] = useState(false);
 
   const { postMessage, onMessage, isVSCode } = useVSCode();
 
@@ -387,10 +389,10 @@ const App: React.FC = () => {
     });
   }, [postMessage]);
 
-  // Handle MCP config click
+  // Handle MCP config click - show MCP config panel
   const handleMcpConfigClick = useCallback(() => {
-    postMessage({ type: 'action', action: 'openMcpConfig' });
-  }, [postMessage]);
+    setShowMcpConfigPanel(true);
+  }, []);
 
   // Handle get completions from mpp-core
   const handleGetCompletions = useCallback((text: string, cursorPosition: number) => {
@@ -407,6 +409,8 @@ const App: React.FC = () => {
     if (action === 'insertText' && (item.type === 'command' || item.type === 'custom_command')) {
       // The ChatInput will receive this via extension message
       postMessage({ type: 'omnibarInsertText', data: { text: item.title } });
+    } else if (action === 'setting' && item.id === 'setting_mcp') {
+      setShowMcpConfigPanel(true);
     }
   }, [postMessage]);
 
@@ -519,6 +523,12 @@ const App: React.FC = () => {
           isNewConfig={isNewConfig}
         />
       )}
+
+      {/* MCP Config Panel */}
+      <McpConfigPanel
+        isOpen={showMcpConfigPanel}
+        onClose={() => setShowMcpConfigPanel(false)}
+      />
     </div>
   );
 };

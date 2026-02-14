@@ -53,6 +53,9 @@ export interface ExtensionMessage {
     | 'planCleared'
     // Omnibar events
     | 'omnibarItems'
+    // MCP config events
+    | 'mcpConfigUpdate'
+    | 'mcpToolsResult'
     // Error and control
     | 'error'
     | 'historyCleared';

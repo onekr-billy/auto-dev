@@ -147,6 +147,7 @@ export const Omnibar: React.FC<OmnibarProps> = ({ isOpen, onClose, onAction }) =
       onAction?.(item, 'insertText');
       postMessage({ type: 'omnibarAction', data: { action: 'insertText', item } });
     } else if (item.type === 'setting') {
+      onAction?.(item, 'setting');
       postMessage({ type: 'omnibarAction', data: { action: 'setting', itemId: item.id } });
     }
     onClose();

@@ -819,6 +819,31 @@ configs:
         // Open MCP configuration
         await this.openMcpConfig();
         break;
+
+      case 'getMcpConfig':
+        // Get MCP configuration for the panel
+        await this.sendMcpConfig();
+        break;
+
+      case 'saveMcpServer':
+        // Save/update an MCP server
+        await this.handleSaveMcpServer(data);
+        break;
+
+      case 'deleteMcpServer':
+        // Delete an MCP server
+        await this.handleDeleteMcpServer(data?.serverName as string);
+        break;
+
+      case 'toggleMcpServer':
+        // Toggle an MCP server enabled/disabled
+        await this.handleToggleMcpServer(data?.serverName as string, data?.disabled as boolean);
+        break;
+
+      case 'getMcpServerTools':
+        // Get tools for a specific MCP server
+        await this.handleGetMcpServerTools(data?.serverName as string);
+        break;
     }
   }
 
@@ -850,6 +875,166 @@ configs:
       const message = error instanceof Error ? error.message : String(error);
       this.log(`Failed to open MCP config: ${message}`);
       vscode.window.showErrorMessage(`Failed to open MCP config: ${message}`);
+    }
+  }
+
+  /**
+   * Get MCP config file path
+   */
+  private getMcpConfigPath(): string {
+    const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+    return `${homeDir}/.autodev/mcp.json`;
+  }
+
+  /**
+   * Read MCP configuration from file
+   */
+  private async readMcpConfig(): Promise<{ mcpServers: Record<string, any> }> {
+    const fs = await import('fs').then(m => m.promises);
+    const configPath = this.getMcpConfigPath();
+    try {
+      const content = await fs.readFile(configPath, 'utf-8');
+      return JSON.parse(content);
+    } catch {
+      return { mcpServers: {} };
+    }
+  }
+
+  /**
+   * Write MCP configuration to file
+   */
+  private async writeMcpConfig(config: { mcpServers: Record<string, any> }): Promise<void> {
+    const fs = await import('fs').then(m => m.promises);
+    const configPath = this.getMcpConfigPath();
+    const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+    await fs.mkdir(`${homeDir}/.autodev`, { recursive: true });
+    await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8');
+  }
+
+  /**
+   * Send MCP configuration to webview
+   */
+  private async sendMcpConfig(): Promise<void> {
+    try {
+      const config = await this.readMcpConfig();
+      const servers = Object.entries(config.mcpServers || {}).map(([name, serverConfig]: [string, any]) => ({
+        name,
+        command: serverConfig.command,
+        url: serverConfig.url,
+        args: serverConfig.args,
+        disabled: serverConfig.disabled || false,
+        env: serverConfig.env,
+        autoApprove: serverConfig.autoApprove,
+        timeout: serverConfig.timeout,
+        trust: serverConfig.trust,
+        headers: serverConfig.headers,
+        cwd: serverConfig.cwd,
+      }));
+      this.postMessage({ type: 'mcpConfigUpdate', data: { servers } });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.log(`Failed to read MCP config: ${message}`);
+      this.postMessage({ type: 'mcpConfigUpdate', data: { servers: [] } });
+    }
+  }
+
+  /**
+   * Save or update an MCP server configuration
+   */
+  private async handleSaveMcpServer(data: any): Promise<void> {
+    try {
+      const config = await this.readMcpConfig();
+      const serverName = data.serverName as string;
+
+      // If renaming (not new, and original name differs), remove old entry
+      if (!data.isNew && data.originalName && data.originalName !== serverName) {
+        delete config.mcpServers[data.originalName as string];
+      }
+
+      // Build server config
+      const serverConfig: Record<string, any> = {};
+      if (data.command) serverConfig.command = data.command;
+      if (data.url) serverConfig.url = data.url;
+      if (data.args && (data.args as string[]).length > 0) serverConfig.args = data.args;
+      if (data.disabled) serverConfig.disabled = data.disabled;
+      if (data.env) serverConfig.env = data.env;
+      if (data.cwd) serverConfig.cwd = data.cwd;
+
+      config.mcpServers[serverName] = serverConfig;
+      await this.writeMcpConfig(config);
+      await this.sendMcpConfig();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.log(`Failed to save MCP server: ${message}`);
+    }
+  }
+
+  /**
+   * Delete an MCP server configuration
+   */
+  private async handleDeleteMcpServer(serverName: string): Promise<void> {
+    try {
+      const config = await this.readMcpConfig();
+      delete config.mcpServers[serverName];
+      await this.writeMcpConfig(config);
+      await this.sendMcpConfig();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.log(`Failed to delete MCP server: ${message}`);
+    }
+  }
+
+  /**
+   * Toggle an MCP server enabled/disabled
+   */
+  private async handleToggleMcpServer(serverName: string, disabled: boolean): Promise<void> {
+    try {
+      const config = await this.readMcpConfig();
+      if (config.mcpServers[serverName]) {
+        config.mcpServers[serverName].disabled = disabled;
+        await this.writeMcpConfig(config);
+        await this.sendMcpConfig();
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.log(`Failed to toggle MCP server: ${message}`);
+    }
+  }
+
+  /**
+   * Get tools for a specific MCP server
+   * Returns tool information discovered from the server
+   */
+  private async handleGetMcpServerTools(serverName: string): Promise<void> {
+    try {
+      const config = await this.readMcpConfig();
+      const serverConfig = config.mcpServers[serverName];
+      if (!serverConfig || serverConfig.disabled) {
+        this.postMessage({ type: 'mcpToolsResult', data: { tools: [] } });
+        return;
+      }
+
+      // Try to use mpp-core's McpToolConfigManager to discover tools
+      try {
+        const McpToolConfigManager = KotlinCC.agent.config.McpToolConfigManager;
+        const serverMap: Record<string, any> = { [serverName]: serverConfig };
+        const tools = await McpToolConfigManager.discoverMcpTools(serverMap, new Set<string>());
+
+        const toolList = Object.values(tools).flat().map((tool: any) => ({
+          name: tool.name || tool.displayName,
+          description: tool.description || '',
+        }));
+
+        this.postMessage({ type: 'mcpToolsResult', data: { tools: toolList } });
+      } catch (e) {
+        // If mpp-core tool discovery fails, return empty
+        this.log(`MCP tool discovery not available: ${e}`);
+        this.postMessage({ type: 'mcpToolsResult', data: { tools: [] } });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.log(`Failed to get MCP server tools: ${message}`);
+      this.postMessage({ type: 'mcpToolsResult', data: { tools: [] } });
     }
   }
 
