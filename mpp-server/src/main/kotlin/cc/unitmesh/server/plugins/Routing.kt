@@ -5,6 +5,7 @@ import cc.unitmesh.server.auth.AuthService
 import cc.unitmesh.server.config.ServerConfig
 import cc.unitmesh.server.model.*
 import cc.unitmesh.server.service.AgentService
+import cc.unitmesh.server.service.McpToolService
 import cc.unitmesh.server.service.ProjectService
 import cc.unitmesh.server.session.SessionManager
 import cc.unitmesh.server.workflow.engine.WorkflowEngine
@@ -28,6 +29,7 @@ fun Application.configureRouting() {
     val config = ServerConfig.load()
     val projectService = ProjectService(config.projects)
     val agentService = AgentService(config.llm)
+    val mcpToolService = McpToolService()
 
     // 初始化会话管理和认证服务
     val sessionManager = SessionManager()
@@ -84,6 +86,86 @@ fun Application.configureRouting() {
                         )
                     } else {
                         call.respond(project)
+                    }
+                }
+            }
+
+            // MCP Tool management
+            route("/mcp") {
+                // List all MCP servers
+                get("/servers") {
+                    val servers = mcpToolService.getServers()
+                    call.respond(McpServerListResponse(servers = servers))
+                }
+
+                // Add or update an MCP server
+                post("/servers") {
+                    val request = call.receive<McpServerSaveRequest>()
+                    if (!request.config.validate()) {
+                        return@post call.respond(
+                            HttpStatusCode.BadRequest,
+                            mapOf("error" to "Invalid server config: must have 'command' or 'url', not both")
+                        )
+                    }
+                    val servers = mcpToolService.saveServer(request.name, request.config)
+                    call.respond(McpServerListResponse(servers = servers))
+                }
+
+                // Delete an MCP server
+                delete("/servers/{name}") {
+                    val name = call.parameters["name"] ?: return@delete call.respond(
+                        HttpStatusCode.BadRequest,
+                        mapOf("error" to "Missing server name")
+                    )
+                    val servers = mcpToolService.deleteServer(name)
+                    call.respond(McpServerListResponse(servers = servers))
+                }
+
+                // Get server statuses
+                get("/servers/status") {
+                    val statuses = mcpToolService.getServerStatuses()
+                    call.respond(McpServerStatusResponse(statuses = statuses))
+                }
+
+                // Discover tools from all servers
+                get("/tools") {
+                    try {
+                        val tools = mcpToolService.discoverTools()
+                        call.respond(McpToolListResponse(tools = tools))
+                    } catch (e: Exception) {
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            mapOf("error" to "Failed to discover tools: ${e.message}")
+                        )
+                    }
+                }
+
+                // Toggle tool enabled state
+                post("/tools/toggle") {
+                    val request = call.receive<McpToolToggleRequest>()
+                    mcpToolService.toggleTool(request.toolName, request.enabled)
+                    call.respond(mapOf("success" to true))
+                }
+
+                // Execute a tool
+                post("/tools/execute") {
+                    val request = call.receive<McpToolExecuteRequest>()
+                    try {
+                        val result = mcpToolService.executeTool(
+                            request.serverName,
+                            request.toolName,
+                            request.arguments
+                        )
+                        call.respond(McpToolExecuteResponse(result = result))
+                    } catch (e: Exception) {
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            McpToolExecuteResponse(
+                                result = "",
+                                success = false,
+                                error = e.message
+                            )
+                        )
                     }
                 }
             }

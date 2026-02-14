@@ -51,7 +51,12 @@ enum class AgentType {
      * Artifact mode - generate reversible, executable artifacts (HTML/JS, Python scripts)
      * Similar to Claude's Artifacts system
      */
-    ARTIFACT;
+    ARTIFACT,
+
+    /**
+     * MCP Tool mode - manage MCP servers and tools with left panel server list, right panel tool display
+     */
+    MCP_TOOL;
 
     fun getDisplayName(): String = when (this) {
         LOCAL_CHAT -> "Chat"
@@ -62,6 +67,7 @@ enum class AgentType {
         REMOTE -> "Remote"
         WEB_EDIT -> "WebEdit"
         ARTIFACT -> "Artifact"
+        MCP_TOOL -> "MCP"
     }
 
     companion object {
@@ -75,6 +81,7 @@ enum class AgentType {
                 "chatdb", "database" -> CHAT_DB
                 "webedit", "web" -> WEB_EDIT
                 "artifact", "unit" -> ARTIFACT
+                "mcp", "mcptool", "mcp_tool" -> MCP_TOOL
                 else -> LOCAL_CHAT
             }
         }

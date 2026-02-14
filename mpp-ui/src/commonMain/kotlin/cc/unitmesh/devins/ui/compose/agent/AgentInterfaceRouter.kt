@@ -6,6 +6,7 @@ import cc.unitmesh.agent.AgentType
 import cc.unitmesh.devins.ui.compose.agent.artifact.ArtifactPage
 import cc.unitmesh.devins.ui.compose.agent.chatdb.ChatDBPage
 import cc.unitmesh.devins.ui.compose.agent.codereview.CodeReviewPage
+import cc.unitmesh.devins.ui.compose.agent.mcptool.McpToolPage
 import cc.unitmesh.devins.ui.compose.agent.webedit.WebEditPage
 import cc.unitmesh.devins.ui.remote.RemoteAgentPage
 import cc.unitmesh.devins.workspace.Workspace
@@ -156,6 +157,16 @@ fun AgentInterfaceRouter(
                 },
                 onNotification = onNotification,
                 initialBundle = initialBundle // Pass bundle to ArtifactPage
+            )
+        }
+
+        AgentType.MCP_TOOL -> {
+            McpToolPage(
+                modifier = modifier,
+                onBack = {
+                    onAgentTypeChange(AgentType.CODING)
+                },
+                onNotification = onNotification
             )
         }
 
