@@ -51,7 +51,13 @@ enum class AgentType {
      * Artifact mode - generate reversible, executable artifacts (HTML/JS, Python scripts)
      * Similar to Claude's Artifacts system
      */
-    ARTIFACT;
+    ARTIFACT,
+
+    /**
+     * Architect fitness function mode - evaluates code against measurable fitness functions
+     * to verify correctness beyond plausibility (inspired by ThoughtWorks fitness function-driven development)
+     */
+    ARCHITECT_FITNESS;
 
     fun getDisplayName(): String = when (this) {
         LOCAL_CHAT -> "Chat"
@@ -62,6 +68,7 @@ enum class AgentType {
         REMOTE -> "Remote"
         WEB_EDIT -> "WebEdit"
         ARTIFACT -> "Artifact"
+        ARCHITECT_FITNESS -> "Fitness"
     }
 
     companion object {
@@ -75,6 +82,7 @@ enum class AgentType {
                 "chatdb", "database" -> CHAT_DB
                 "webedit", "web" -> WEB_EDIT
                 "artifact", "unit" -> ARTIFACT
+                "fitness", "architect-fitness", "fitnessfunctions" -> ARCHITECT_FITNESS
                 else -> LOCAL_CHAT
             }
         }

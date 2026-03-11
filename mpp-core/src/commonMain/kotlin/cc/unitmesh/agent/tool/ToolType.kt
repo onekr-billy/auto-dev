@@ -4,6 +4,7 @@ import cc.unitmesh.agent.subagent.CodebaseInvestigatorSchema
 import cc.unitmesh.agent.subagent.ContentHandlerSchema
 import cc.unitmesh.agent.subagent.DomainDictAgentSchema
 import cc.unitmesh.agent.subagent.ErrorRecoverySchema
+import cc.unitmesh.agent.subagent.FitnessFunctionAgentSchema
 import cc.unitmesh.agent.subagent.NanoDSLAgentSchema
 import cc.unitmesh.agent.subagent.PlotDSLAgentSchema
 import cc.unitmesh.agent.tool.impl.*
@@ -165,6 +166,15 @@ sealed class ToolType(
         schema = PlotDSLAgentSchema
     )
 
+    data object FitnessAgent : ToolType(
+        name = "fitness-agent",
+        displayName = "Fitness Function Agent",
+        tuiEmoji = "📐",
+        composeIcon = "rule",
+        category = ToolCategory.SubAgent,
+        schema = FitnessFunctionAgentSchema
+    )
+
     data object AskAgent : ToolType(
         name = "ask-agent",
         displayName = "Ask Agent",
@@ -192,6 +202,7 @@ sealed class ToolType(
                 ReadFile, WriteFile, EditFile, Grep, Glob,
                 Shell,
                 ErrorAgent, AnalysisAgent, CodeAgent, DomainDictAgent, NanoDSLAgent, PlotAgent,
+                FitnessAgent,
                 AskAgent,
                 WebFetch
             )
