@@ -7,13 +7,13 @@ import kotlin.test.assertTrue
 
 class JavaScriptPluginDescriptorTest {
     @Test
-    fun `descriptor declares required javascript v2 modules`() {
+    fun testDescriptorDeclaresRequiredJavaScriptV2Modules() {
         val dependencies = parseDependencies("/cc.unitmesh.javascript.xml")
 
-        assertTrue("intellij.javascript.backend" in dependencies)
-        assertTrue("intellij.javascript.common" in dependencies)
-        assertTrue("intellij.javascript.psi.impl" in dependencies)
-        assertTrue("intellij.javascript.testing" in dependencies)
+        assertTrue("intellij.javascript.backend" in dependencies, "Missing required module: intellij.javascript.backend")
+        assertTrue("intellij.javascript.common" in dependencies, "Missing required module: intellij.javascript.common")
+        assertTrue("intellij.javascript.psi.impl" in dependencies, "Missing required module: intellij.javascript.psi.impl")
+        assertTrue("intellij.javascript.testing" in dependencies, "Missing required module: intellij.javascript.testing")
     }
 
     private fun parseDependencies(resourcePath: String): Set<String> {
