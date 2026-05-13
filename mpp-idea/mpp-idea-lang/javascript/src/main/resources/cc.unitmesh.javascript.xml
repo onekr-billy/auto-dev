@@ -1,6 +1,10 @@
 <idea-plugin package="cc.unitmesh.ide.javascript">
     <!--suppress PluginXmlValidity -->
     <dependencies>
+        <module name="intellij.javascript.backend"/>
+        <module name="intellij.javascript.common"/>
+        <module name="intellij.javascript.psi.impl"/>
+        <module name="intellij.javascript.testing"/>
         <plugin id="JavaScript"/>
     </dependencies>
 
